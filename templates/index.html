@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Language Buddy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div id="welcomeOverlay" class="welcome-overlay" aria-hidden="true">
+    <div class="welcome-content">
+      <div class="welcome-badge">Welcome to</div>
+      <h1 class="welcome-title">Language <span>Buddy</span></h1>
+      <p class="welcome-sub">Partner AI interaktif untuk latihan berbagai bahasa</p>
+      <div class="welcome-loader"></div>
+    </div>
+  </div>
+
+  <main id="setupScreen" class="card setup-card">
+    <div class="brand-mark" aria-hidden="true">LB</div>
+    <h1>Language Buddy</h1>
+    <p class="sub">Latih kemampuan bahasa melalui percakapan bebas atau simulasi situasi sehari-hari.</p>
+
+    <!-- >>> FITUR BARU 3 (TAMPILAN): pengguna memilih Chat Bebas atau Simulasi Situasional di halaman awal. -->
+    <label class="section-label">Pilih mode latihan</label>
+    <div class="mode-options" role="group" aria-label="Mode latihan">
+      <button type="button" class="mode-card active" data-mode="chat" aria-pressed="true">
+        <span class="mode-icon" aria-hidden="true">💬</span>
+        <span class="mode-card-title">Chat Bebas</span>
+        <span class="mode-card-description">Ngobrol tentang topik pilihanmu.</span>
+      </button>
+      <button type="button" class="mode-card" data-mode="simulation" aria-pressed="false">
+        <span class="mode-icon" aria-hidden="true">🎭</span>
+        <span class="mode-card-title">Simulasi Situasional</span>
+        <span class="mode-card-description">Latihan percakapan dalam situasi nyata.</span>
+      </button>
+    </div>
+    <input type="hidden" id="mode" value="chat">
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="languageDropdown">Bahasa yang mau dilatih</label>
+        <div class="custom-dropdown" id="languageDropdown">
+          <button type="button" class="dropdown-selected" id="dropdownSelected" aria-haspopup="listbox" aria-expanded="false">
+            <span id="selectedText">Inggris</span><span class="arrow">▼</span>
+          </button>
+          <div class="dropdown-menu hidden" id="dropdownMenu" role="listbox">
+            <button type="button" class="dropdown-item active" data-value="Inggris" role="option" aria-selected="true">Inggris</button>
+            <button type="button" class="dropdown-item" data-value="Indonesia" role="option" aria-selected="false">Indonesia</button>
+            <button type="button" class="dropdown-item" data-value="Jepang" role="option" aria-selected="false">Jepang</button>
+            <button type="button" class="dropdown-item" data-value="Korea" role="option" aria-selected="false">Korea</button>
+            <button type="button" class="dropdown-item" data-value="Mandarin" role="option" aria-selected="false">Mandarin</button>
+            <button type="button" class="dropdown-item" data-value="Arab" role="option" aria-selected="false">Arab</button>
+            <button type="button" class="dropdown-item" data-value="Prancis" role="option" aria-selected="false">Prancis</button>
+            <button type="button" class="dropdown-item" data-value="Jerman" role="option" aria-selected="false">Jerman</button>
+            <button type="button" class="dropdown-item" data-value="Spanyol" role="option" aria-selected="false">Spanyol</button>
+          </div>
+        </div>
+        <input type="hidden" id="language" value="Inggris">
+      </div>
+
+      <div class="form-field">
+        <label for="levelDropdown">Level percakapan</label>
+        <div class="custom-dropdown" id="levelDropdown">
+          <button type="button" class="dropdown-selected" id="levelSelected" aria-haspopup="listbox" aria-expanded="false">
+            <span id="selectedLevelText">Pemula (Beginner)</span><span class="arrow">▼</span>
+          </button>
+          <div class="dropdown-menu hidden" id="levelMenu" role="listbox">
+            {% for key, label in levels.items() %}
+            <button type="button" class="dropdown-item level-item {% if loop.first %}active{% endif %}" data-value="{{ key }}" role="option" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ label }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        <input type="hidden" id="level" value="1">
+      </div>
+    </div>
+
+    <div id="chatOptions" class="mode-dependent">
+      <label for="topic">Topik obrolan</label>
+      <input type="text" id="topic" value="bebas, apa saja" placeholder="Contoh: hobi, film, kuliah">
+    </div>
+
+    <!-- >>> FITUR BARU 3 (TAMPILAN): tema simulasi dipilih sebelum sesi dimulai. -->
+    <div id="simulationOptions" class="mode-dependent hidden">
+      <label for="simulationTheme">Pilih tema simulasi</label>
+      <select id="simulationTheme">
+        {% for theme in simulation_themes %}
+        <option value="{{ theme }}">{{ theme }}</option>
+        {% endfor %}
+      </select>
+      <p class="field-help">Buddy AI akan berperan sebagai lawan bicara dan memulai skenario.</p>
+    </div>
+
+    <label for="strictnessDropdown">Tingkat koreksi AI</label>
+    <div class="custom-dropdown" id="strictnessDropdown">
+      <button type="button" class="dropdown-selected" id="strictnessSelected" aria-haspopup="listbox" aria-expanded="false">
+        <span id="selectedStrictnessText">Santai (Koreksi ringan)</span><span class="arrow">▼</span>
+      </button>
+      <div class="dropdown-menu hidden" id="strictnessMenu" role="listbox">
+        <button type="button" class="dropdown-item strictness-item active" data-value="santai" role="option" aria-selected="true">Santai (Koreksi ringan)</button>
+        <button type="button" class="dropdown-item strictness-item" data-value="sedang" role="option" aria-selected="false">Standar (Koreksi umum)</button>
+        <button type="button" class="dropdown-item strictness-item" data-value="ketat" role="option" aria-selected="false">Presisi (Koreksi detail)</button>
+      </div>
+    </div>
+    <input type="hidden" id="strictness" value="santai">
+
+    <button id="startBtn" type="button">Mulai Chat</button>
+    <p class="privacy-note">Skor diperbarui selama latihan. Kuis kosakata dapat dibuat dari percakapanmu.</p>
+  </main>
+
+  <main id="chatLayout" class="chat-layout hidden">
+    <!-- >>> FITUR BARU 1 (TAMPILAN): panel skor keseluruhan, tiga aspek penilaian, dan catatan AI. -->
+    <aside id="scorePanel" class="score-card" aria-live="polite">
+      <div class="score-heading">
+        <div>
+          <p class="eyebrow">PERKEMBANGAN</p>
+          <h2>Skor Percakapan</h2>
+        </div>
+        <span class="score-spark" aria-hidden="true">↗</span>
+      </div>
+      <div class="overall-score-wrap">
+        <span id="overallScore" class="overall-score">--</span>
+        <span class="score-denominator">/ 100</span>
+      </div>
+      <p id="scoreStatus" class="score-status">Skor muncul setelah pesan pertama.</p>
+
+      <div class="score-metric">
+        <div class="metric-label"><span>Tata bahasa</span><strong id="grammarScore">--</strong></div>
+        <div class="progress-track"><div id="grammarBar" class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="score-metric">
+        <div class="metric-label"><span>Kosakata</span><strong id="vocabularyScore">--</strong></div>
+        <div class="progress-track"><div id="vocabularyBar" class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="score-metric">
+        <div class="metric-label"><span>Kejelasan</span><strong id="clarityScore">--</strong></div>
+        <div class="progress-track"><div id="clarityBar" class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="feedback-box">
+        <strong>Catatan Buddy</strong>
+        <p id="scoreFeedback">Mulai percakapan untuk mendapatkan saran belajar.</p>
+      </div>
+      <p class="score-disclaimer">Skor adalah perkiraan pembelajaran berbantuan AI, bukan sertifikat kemampuan resmi.</p>
+    </aside>
+
+    <section id="chatScreen" class="chat-card">
+      <header class="chat-header">
+        <div class="chat-heading">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <h2>Language Buddy</h2>
+            <p id="metaInfo" class="meta-info">Inggris · Pemula · Chat Bebas</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <!-- >>> FITUR BARU 2 (TAMPILAN): tombol untuk meminta kuis berdasarkan isi percakapan. -->
+          <button id="quizBtn" type="button" class="secondary-action">Kuis Kosakata</button>
+          <button id="endBtn" type="button" class="ghost">Sesi Baru</button>
+        </div>
+      </header>
+
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <footer class="chat-footer">
+        <input type="text" id="userInput" placeholder="Ketik pesanmu..." autocomplete="off" aria-label="Pesan kamu">
+        <button id="sendBtn" type="button">Kirim</button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- >>> FITUR BARU 2 (TAMPILAN): modal tempat soal, pilihan jawaban, hasil, dan penjelasan kuis ditampilkan. -->
+  <section id="quizModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="quizTitle">
+    <div class="quiz-dialog">
+      <header class="quiz-header">
+        <div>
+          <p class="eyebrow">LATIHAN MANDIRI</p>
+          <h2 id="quizTitle">Kuis Kosakata</h2>
+          <p class="quiz-subtitle">Soal dibuat berdasarkan percakapanmu.</p>
+        </div>
+        <button id="closeQuizBtn" type="button" class="icon-close" aria-label="Tutup kuis">×</button>
+      </header>
+      <div id="quizContent" class="quiz-content">
+        <p class="quiz-loading">Buddy sedang menyiapkan kuis kosakata...</p>
+      </div>
+      <footer id="quizFooter" class="quiz-footer hidden">
+        <span id="quizProgress" class="quiz-progress"></span>
+        <button id="quizSubmitBtn" type="button">Periksa Jawaban</button>
+      </footer>
+    </div>
+  </section>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
