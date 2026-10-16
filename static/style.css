@@ -396,7 +396,36 @@ button.ghost:hover {
 .welcome-sub {
   color: #9ba3af;
   font-size: 1rem;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
+}
+
+.welcome-credits {
+  max-width: 520px;
+  margin: 0 auto 24px;
+  padding: 13px 18px;
+  border: 1px solid rgba(230, 168, 68, 0.25);
+  border-radius: 12px;
+  background: rgba(230, 168, 68, 0.06);
+}
+
+.welcome-credits-label {
+  margin-bottom: 7px;
+  color: #e6a844;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.welcome-creators {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.welcome-creators span {
+  padding: 0 5px;
+  color: #e6a844;
 }
 
 /* Loading Line Animation */
@@ -985,6 +1014,19 @@ button.ghost {
 }
 
 @media (max-width: 700px) {
+  .welcome-title {
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
+  }
+
+  .welcome-credits {
+    max-width: 90vw;
+    padding: 12px 14px;
+  }
+
+  .welcome-creators {
+    font-size: 0.82rem;
+  }
+
   body {
     align-items: flex-start;
     padding: 14px 10px;
@@ -1076,4 +1118,27 @@ button.ghost {
   .header-actions {
     width: 100%;
   }
+}
+
+/* Kredit pembuat aplikasi */
+.app-credit {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8791a3;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.app-credit strong {
+  color: #e6a844;
+  font-weight: 650;
+}
+
+.chat-credit {
+  margin-top: 16px;
+  padding-top: 12px;
+  font-size: 0.7rem;
+  text-align: left;
 }
